@@ -1,0 +1,9 @@
+langchain
+langgraph
+langgraph-checkpoint-sqlite
+chromadb
+sentence-transformers
+fastapi
+uvicorn
+pydantic
+fastmcp
