@@ -1,0 +1,1 @@
+In the event of a widespread system outage or app failure, the outage-communication protocol dictates that an alert banner be deployed in the app within 15 minutes. Support agents must utilize predefined macro responses to acknowledge the issue and halt manual troubleshooting. Hourly updates must be pushed to official social media channels until full functionality is restored.

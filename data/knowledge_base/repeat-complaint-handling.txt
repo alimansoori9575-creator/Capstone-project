@@ -1,0 +1,1 @@
+A user submitting three or more complaints regarding the same issue within a seven-day period triggers the repeat-complaint protocol. These accounts are automatically flagged as chronic, and their subsequent tickets bypass Tier 1 support entirely. A dedicated customer success manager must review the account history before authorizing further action or compensation.

@@ -1,0 +1,1 @@
+Approved refunds for ride cancellations or fare disputes are processed back to the original payment method. Wallet refunds are credited almost instantly, while bank or credit card refunds take three to five business days to reflect in the user's account. Maximum compensation limits apply unless explicitly overridden by a Tier 2 supervisor.

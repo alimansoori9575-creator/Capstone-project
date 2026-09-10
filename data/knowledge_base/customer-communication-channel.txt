@@ -1,0 +1,1 @@
+In-app chat serves as the primary communication channel for all standard customer inquiries and support tickets. Email is utilized as a secondary channel for complex issues requiring document attachments or detailed explanations. Direct phone support is exclusively restricted to active safety incidents and Tier 3 critical escalations.

@@ -1,0 +1,1 @@
+Corporate clients and users enrolled in the highest tier of the Ola loyalty program are classified as VIP customers. VIP support tickets are routed to a specialized queue that bypasses standard Tier 1 triage. This queue guarantees a dedicated account specialist and a strict two-hour initial response SLA regardless of the issue type.

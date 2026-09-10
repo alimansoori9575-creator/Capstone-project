@@ -1,0 +1,1 @@
+Our Service Level Agreements dictate maximum resolution times based on ticket severity. Critical priority tickets must be addressed within one hour of submission. High priority tickets require a resolution or update within four hours. Normal and Low priority tickets carry a standard resolution window of 24 to 72 hours, respectively.

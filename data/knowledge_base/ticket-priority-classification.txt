@@ -1,0 +1,1 @@
+Support tickets are classified into four priority tiers: Critical, High, Normal, and Low. Critical priority is reserved for immediate safety concerns or active ride emergencies. High priority covers severe app bugs or significant billing disputes. Normal and Low priorities apply to general inquiries, feedback, and minor account issues.
