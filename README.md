@@ -1,49 +1,36 @@
-# Ola Domain Support Agent Capstone
+# Ola Support Agent - Capstone Project
 
-**Track Completed:** Ola (Business Operations / Customer Support)
+**Track:** Business Operations / Customer Support (Ola)
 
-## Dataset Design Choices (Part 1, Task 1)
-The support ticket dataset (`data/tickets.json`) was generated deterministically. To reproduce the exact dataset, use the following parameters:
+This is my final submission for the Ola domain support agent. The entire project is set up to run locally using the `MOCK_LLM` setting, meaning no API keys or paid accounts are needed to test the agent, RAG, or the API.
 
-*   **Generator Seed:** `42`
-*   **Resolution Time Range:** `0.5` to `72.0` hours. 
-    *   *Reasoning:* Simple billing disputes are usually resolved quickly (under an hour), while complex product defects or safety escalations require manual investigation spanning multiple days.
-*   **Dataset Size:** 40 records
-*   **Category Distribution:** 
-   - Billing: 9 records
-   - General Inquiry: 7 records
-   - Product Defect: 6 records
-   - Technical Issue: 6 records
-   - Account Access: 12 records
-*   **Status Distribution:** 
-   - Open: 11 records
-   - Resolved: 13 records
-   - In Progress: 6 records
-   - Closed: 9 records
-   - Escalated: 1 records
-*   **Escalated Percentage:** 6/40 (15.0%)
-(Successfully landed in the 10-30% required band).
+## 1. Dataset Generation (Part 1)
+To make sure the dataset (`data/tickets.json`) is fully reproducible, I used `42` as the random seed in `dataset.py`.
 
-## RAG Calibration & Chunking Strategy Evaluation
+* **Time Range:** I set the resolution time range between 0.5 and 72.0 hours. I figured simple billing questions usually get closed in under an hour, but complex escalations might take a few days to investigate.
+* **Distribution:** I used equal weighting to make sure we hit the minimum coverage rules for every category and status. 
+  * *Categories:* Billing (9), General Inquiry (7), Product Defect (6), Technical Issue (6), Account Access (12).
+  * *Statuses:* Open (11), Resolved (13), In Progress (6), Closed (9), Escalated (1).
+* **Escalation Rate:** The random draw resulted in 6 out of 40 tickets being escalated (15.0%), which lands perfectly in the required 10-30% range.
 
-### 1. Empirical Fallback Threshold Calibration (Task 4)
-Top-1 cosine similarity was measured across in-scope and out-of-scope queries:
-* **In-Scope Queries:** 
-  * "What is the resolution time for a Critical priority ticket?": `0.788`
-  * "How long do wallet refunds take to process?": `0.850`
-  * "Can I get a refund for a driver cancellation?": `0.631`
-  * "What triggers the repeat-complaint protocol?": `0.803`
-  * "Who handles media attention escalations?": `0.424`
-  * *Range: 0.424 – 0.850*
-* **Out-of-Scope Queries:** 
-  * "What is the recipe for chocolate cake?": `0.033`
-  * "How do I fix my broken lawnmower?": `0.086`
-  * *Range: 0.033 – 0.086*
+## 2. RAG & Chunking Setup
 
-**Chosen Fallback Threshold:** `0.30`. This threshold sits safely between the out-of-scope ceiling (`0.086`) and the in-scope floor (`0.424`), reliably triggering the fallback response on irrelevant prompts.
+**Threshold Calibration:**
+I tested the top-1 cosine similarity to find a good cutoff for the "I don't know" fallback. 
+* My in-scope test queries (like "How long do wallet refunds take?" and "What is the resolution time for a Critical priority ticket?") scored between `0.424` and `0.850`.
+* My completely random out-of-scope queries (like asking for a cake recipe or how to fix a lawnmower) scored really low, between `0.033` and `0.086`.
+* **Decision:** I set the threshold to `0.30`. It creates a safe buffer so weird user prompts get blocked, but legit policy questions still easily pass through.
 
-### 2. Chunking Strategy Comparison (Task 5)
-* **Fixed-Size Chunking (`ola_fixed_chunks`):** Average Precision@3 = `0.33`, Average Recall@3 = `1.00` (41 total chunks).
-* **Sentence-Based Chunking (`ola_sentence_chunks`):** Average Precision@3 = `0.33`, Average Recall@3 = `1.00` (38 total chunks).
+**Chunking Strategy:**
+I compared fixed-size chunks (`ola_fixed_chunks`) against sentence-based chunking (`ola_sentence_chunks`). Both actually gave me a Recall@3 of 1.00 and a Precision@3 of 0.33. However, I decided to deploy the **sentence-based chunking**. It keeps the vector store slightly smaller (38 chunks vs 41) and avoids cutting sentences in half, which just feels cleaner for text-heavy policy documents.
 
-**Deployment Recommendation:** We deploy the **sentence-based chunking strategy (`ola_sentence_chunks`)**. While both strategies attained an identical 1.00 Recall@3, sentence chunking produced complete syntactic thoughts without splitting sentences across chunk boundaries, resulting in a more compact vector store (38 chunks vs 41 chunks) without any retrieval degradation.
+## 3. Escalation Logic
+For the `check_support_ticket_status` tool, I wrote a custom escalation score formula: `(0.6 * escalated_boolean) + (0.4 * normalized_recency)`. The recency part just divides the days open by a 30-day window. If the final score hits `0.60` or higher, the agent flags it for the "Escalate to Tier 2" action. 
+
+## How to Test My Code
+
+Here is how to run the different parts of the capstone.
+
+**1. Test the LangGraph Graph (Memory, Checkpoints, Timeouts)**
+```bash
+python -m app.graph
